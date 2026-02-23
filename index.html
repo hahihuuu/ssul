@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roman | 썰읽남</title>
+    <style>
+        :root {
+            --main-pink: #FF4D94;
+            --light-pink: #FFF0F5;
+            --dark-pink: #C71585;
+            --bg-color: #f8f9fa;
+            --border-color: #eee;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            line-height: 1.5;
+        }
+
+        /* Header & Profile */
+        header {
+            background: #fff; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--light-pink);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 22px; font-weight: 900; color: var(--main-pink); letter-spacing: -1px; }
+
+        .profile-card {
+            background: #fff; padding: 25px 20px;
+            display: flex; flex-direction: column; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* 프로필 이미지 1280x768 최적화 */
+        .profile-img {
+            width: 90px; height: 90px; border-radius: 50%;
+            background-image: url('https://github.com/hahihuuu/ssul/blob/main/Gemini_Generated_Image_h8wl4vh8wl4vh8wl.png?raw=true'); /* 여기에 이미지 경로 입력 */
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 12px; border: 3px solid var(--light-pink);
+            background-color: #eee;
+        }
+
+        .profile-info h1 { margin: 0; font-size: 22px; font-weight: 800; }
+        .badge-19 { background: #ff4444; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 5px; }
+        
+        .follower-text { font-size: 14px; color: #777; margin-top: 5px; }
+        
+        /* 추가된 문의 이메일 스타일 */
+        .profile-bio {
+            font-size: 13px;
+            color: #999;
+            margin: 5px 0 15px 0;
+            background: #fdfdfd;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .btn-group { display: flex; gap: 8px; width: 100%; max-width: 320px; }
+        .btn-group button {
+            flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px;
+        }
+        .btn-follow { background: var(--main-pink); color: #fff; }
+        .btn-follow.active { background: #ddd; color: #666; }
+        .btn-sub { background: var(--light-pink); color: var(--dark-pink); }
+
+        /* Nav */
+        nav {
+            background: #fff; display: flex; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 54px; z-index: 999;
+        }
+        .nav-item {
+            flex: 1; padding: 15px 0; text-align: center; font-size: 14px; font-weight: 700; color: #999; cursor: pointer;
+        }
+        .nav-item.active { color: var(--main-pink); border-bottom: 3px solid var(--main-pink); }
+
+        /* Content Area */
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* 동영상 썸네일 1280x768 (5:3) 최적화 */
+        .thumb { 
+            width: 100%; 
+            aspect-ratio: 1280 / 768; 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #000;
+            border-radius: 8px;
+        }
+        .video-card { background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .video-meta { padding: 12px; }
+        .video-title { font-weight: 700; font-size: 15px; margin-bottom: 5px; color: #222; }
+        .video-sub { font-size: 12px; color: #888; }
+
+        /* List Items */
+        .list-card { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border-color); cursor: pointer; }
+        .tag-board { font-size: 11px; font-weight: 800; color: var(--main-pink); margin-bottom: 4px; display: block; }
+        .list-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; display: block; }
+        .list-author { font-size: 12px; color: #999; }
+
+        /* Comments */
+        .comment-section { background: #f9f9f9; border-radius: 8px; margin-top: 12px; padding: 10px; display: none; }
+        .comment-item { padding: 8px 0; border-bottom: 1px dotted #ddd; font-size: 13px; }
+        .c-user { font-weight: 700; color: var(--dark-pink); margin-right: 6px; }
+
+        /* Info Tab */
+        .info-box { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .info-box h3 { margin: 0 0 15px; font-size: 17px; color: var(--main-pink); }
+        .tmi-list { padding: 0; margin: 0; list-style: none; font-size: 14px; color: #555; }
+        .tmi-list li { margin-bottom: 10px; }
+        .cmd-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .tag { background: var(--light-pink); color: var(--dark-pink); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; }
+
+        /* Modal */
+        .modal-bg { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:2000; }
+        .modal { background:#fff; width:85%; max-width:320px; border-radius:20px; padding:25px; text-align:center; }
+        .modal h2 { font-size: 18px; margin-top:0; }
+        .modal-btns { display:flex; gap:10px; margin-top:20px; }
+        .modal-btns button { flex:1; padding:12px; border-radius:10px; border:none; font-weight:bold; cursor:pointer; }
+        .btn-yes { background: var(--main-pink); color:#fff; }
+        .btn-no { background:#eee; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">ROMAN</div>
+    <div style="font-weight: 800; color: var(--main-pink); font-size: 13px;">LIVE ● 12,841 시청중</div>
+</header>
+
+<div class="profile-card">
+    <div class="profile-img"></div>
+    <div class="profile-info">
+        <h1 style="text-align: center;">썰읽남<span class="badge-19">19+</span></h1>
+    </div>
+    <div class="follower-text">팔로워 <strong id="fCount">107,520</strong>명</div>
+    
+    <div class="profile-bio">문의 ssulseohun@roman.com</div>
+    
+    <div class="btn-group">
+        <button id="followBtn" class="btn-follow" onclick="handleFollow()">팔로우</button>
+        <button class="btn-sub" onclick="showSubModal()">정기구독</button>
+    </div>
+</div>
+
+<nav>
+    <div class="nav-item active" onclick="switchTab('tab-v', this)">동영상</div>
+    <div class="nav-item" onclick="switchTab('tab-f', this)">팬카페</div>
+    <div class="nav-item" onclick="switchTab('tab-c', this)">커뮤니티</div>
+    <div class="nav-item" onclick="switchTab('tab-i', this)">정보</div>
+</nav>
+
+<div class="container">
+    <div id="tab-v" class="tab-content active">
+        <div class="video-card">
+            <div class="thumb" style="background-image: url('https://github.com/hahihuuu/ssul/blob/main/%EC%8D%B8%EB%84%A4%EC%9D%BC1.jpg?raw=true');"></div>
+            <div class="video-meta">
+                <div class="video-title">충격주의! 남친이 XX해서 고민이라고?</div>
+                <div class="video-sub">조회수 48만회 • 1일 전</div>
+            </div>
+        </div>
+        <div class="video-card">
+            <div class="thumb" style="background-image: url('https://github.com/hahihuuu/ssul/blob/main/%EC%8D%B8%EB%84%A4%EC%9D%BC2.jpg?raw=true');"></div>
+            <div class="video-meta">
+                <div class="video-title">썸녀와 그린라이트인지 궁금한 모솔남</div>
+                <div class="video-sub">조회수 89만회 • 4일 전</div>
+            </div>
+        </div>
+        <div class="video-card">
+            <div class="thumb"  style="background-image: url('https://github.com/hahihuuu/ssul/blob/main/%EC%8D%B8%EB%84%A4%EC%9D%BC3.jpg?raw=true');"></div>
+            <div class="video-meta">
+                <div class="video-title">부모님 몰래 남친이랑 외박하는 법</div>
+                <div class="video-sub">조회수 102만회 • 7일 전</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-f" class="tab-content">
+        <div class="list-card" onclick="toggleCmt('fc1')">
+            <span class="tag-board">고해성사 게시판</span>
+            <span class="list-title">어제 처음 본 사람이랑 사고쳤습니다.. 어떡하죠?</span>
+            <span class="list-author">작성자: 익명쫑알이 • 2시간 전</span>
+            <div id="fc1" class="comment-section">
+                <div class="comment-item"><span class="c-user">썰러브</span> 헉.. 오늘 방송에서 제발 읽어줬으면!!</div>
+                <div class="comment-item"><span class="c-user">현생불가남</span> 썰읽남님이 딱 좋아할 소재네ㅋㅋ</div>
+                <div class="comment-item"><span class="c-user">모솔탈출</span> 그래서 어떻게 됐나요?</div>
+            </div>
+        </div>
+        <div class="list-card" onclick="toggleCmt('fc2')">
+            <span class="tag-board">후기 게시판</span>
+            <span class="list-title">방금 상담받은 고민녀입니다! 오빠 덕분에 맘 굳혔어요.</span>
+            <span class="list-author">작성자: 쿨한여우 • 3시간 전</span>
+            <div id="fc1" class="comment-section">
+                <div class="comment-item"><span class="c-user">썰러브</span> 헉.. 방송 사연으로 보내보세요</div>
+                <div class="comment-item"><span class="c-user">현생불가</span> 썰읽남님이 딱 좋아할 소재네ㅋㅋ</div>
+                <div class="comment-item"><span class="c-user">모솔탈출</span> 그래서 어떻게 됐나요?</div>
+            </div>
+        </div>
+        <div class="list-card" onclick="toggleCmt('fc3')">
+            <span class="tag-board">팬아트 게시판</span>
+            <span class="list-title">섹시한 버전으로 썰읽남 캐릭터 그려봤어요 (후방주의)</span>
+            <span class="list-author">작성자: 금손쫑알 • 5시간 전</span>
+        </div>
+        <div class="list-card" onclick="toggleCmt('fc4')">
+            <span class="tag-board">자유게시판</span>
+            <span class="list-title">오늘 야식 뭐 먹을거야 다들?</span>
+            <span class="list-author">작성자: 배고픈벨 • 6시간 전</span>
+        </div>
+        <div class="list-card" onclick="toggleCmt('fc5')">
+            <span class="tag-board">스케줄 게시판</span>
+            <span class="list-title">📅 2월 4주차 썰읽남 방송 스케줄 안내</span>
+            <span class="list-author">작성자: 강서훈 • 1일 전</span>
+        </div>
+    </div>
+
+    <div id="tab-c" class="tab-content">
+        <div class="list-card" onclick="toggleCmt('cc1')">
+            <span class="list-title">📢 오늘 밤 10시, 역대급 매운맛 사연 갑니다.</span>
+            <span class="list-author">썰읽남 • 1시간 전</span>
+            <div id="cc1" class="comment-section">
+                <div class="comment-item"><span class="c-user">쫑1쫑알</span> 벌써 떨린다</div>
+                <div class="comment-item"><span class="c-user">서훈읽기</span> 오늘 잠 다 잤다ㅋㅋ</div>
+                <div class="comment-item"><span class="c-user">인생뭐있냐</span> 형 오늘도 잘생겼어</div>
+                <div class="comment-item"><span class="c-user">밥밥콩밥</span> 치킨 시켜놓고 대기중</div>
+                <div class="comment-item"><span class="c-user">강서훈부인</span> 오빠 사랑해!!</div>
+            </div>
+        </div>
+        <div class="list-card" onclick="toggleCmt('cc2')">
+            <span class="list-title">유튜브 구독자 50만 돌파! 고맙다, 쫑알이들아.</span>
+            <span class="list-author">썰읽남 • 1주일 전</span>
+            <div id="cc2" class="comment-section">
+                <div class="comment-item"><span class="c-user">썰서훈</span> 100만 가즈아!!</div>
+                <div class="comment-item"><span class="c-user">맘을다지기</span> 역시 썰읽남이 대세</div>
+                <div class="comment-item"><span class="c-user">고성방가방가</span> 매일 영상 챙겨보고 있어요</div>
+                <div class="comment-item"><span class="c-user">로망출석러</span> 골드버튼 언박싱 고고</div>
+                <div class="comment-item"><span class="c-user">썰Holic</span> 형 나도 한 지분 있다!</div>
+            </div>
+        </div>
+        <div class="list-card" onclick="toggleCmt('cc3')">
+            <span class="list-title">커피 기프티콘 이벤트 당첨자 발표했습니다!</span>
+            <span class="list-author">썰읽남 • 1개월 전</span>
+            <div id="cc3" class="comment-section">
+                <div class="comment-item"><span class="c-user">강남구왕자</span> 와 대박 나 당첨됨!!</div>
+                <div class="comment-item"><span class="c-user">종알종알</span> 아.. 다음 기회에 ㅠㅠ</div>
+                <div class="comment-item"><span class="c-user">백수가꿈</span> 축하드려요 다들</div>
+                <div class="comment-item"><span class="c-user">ssululul</span> 형 다음엔 피자 해줘</div>
+                <div class="comment-item"><span class="c-user">내가얘기해볼게</span> 잘 마실게요 형!</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-i" class="tab-content">
+        <div class="info-box">
+            <h3>👤 TMI</h3>
+            <ul class="tmi-list">
+                <li>1. 20대 초반 원나잇 경험 았음</li>
+                <li>2. 대기업 웹 개발자에서 전업 스트리머 전향</li>
+                <li>3. 월 수익 1억 내외</li>
+                <li>4. 팬 애칭은 썰을 쫑알쫑알 얘기한다는 뜻에서 직접 지음</li>
+                <li>5. 스트리머 일이 재미있어 스트레스가 별로 없음</li>
+
+            </ul>
+        </div>
+        <div class="info-box">
+            <h3>🤖 명령어</h3>
+            <div class="cmd-tags">
+                <div class="tag">1️⃣(인칭)</div><div class="tag">3️⃣(인칭)</div>
+                <div class="tag">!요약</div><div class="tag">!점검</div>
+                <div class="tag">!팬카페</div><div class="tag">!유튜브</div>
+                <div class="tag">!채팅</div><div class="tag">!고해성사</div>
+            </div>
+            <p style="font-size: 13px; color: #888; margin: 0;">* 채팅창에 입력하면 썰읽남 봇이 대답해줍니다.</p>
+        </div>
+    </div>
+</div>
+
+<div id="subModal" class="modal-bg">
+    <div class="modal">
+        <h2 id="mText">1개월 구독하시겠습니까?</h2>
+        <div id="mBtns" class="modal-btns">
+            <button class="btn-yes" onclick="confirmSub()">예</button>
+            <button class="btn-no" onclick="closeSubModal()">아니오</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 팔로우 토글
+    let followed = false;
+    function handleFollow() {
+        const btn = document.getElementById('followBtn');
+        const count = document.getElementById('fCount');
+        if(!followed) {
+            btn.innerText = '팔로워';
+            btn.classList.add('active');
+            count.innerText = '107,521';
+            followed = true;
+        } else {
+            btn.innerText = '팔로우';
+            btn.classList.remove('active');
+            count.innerText = '100,000';
+            followed = false;
+        }
+    }
+
+    // 구독 모달
+    function showSubModal() {
+        document.getElementById('subModal').style.display = 'flex';
+        document.getElementById('mText').innerText = "1개월 구독하시겠습니까?";
+        document.getElementById('mBtns').style.display = 'flex';
+    }
+    function closeSubModal() {
+        document.getElementById('subModal').style.display = 'none';
+    }
+    function confirmSub() {
+        document.getElementById('mText').innerText = "🎉쫑알이의 1개월 구독을 축하합니다!🎉";
+        document.getElementById('mBtns').style.display = 'none';
+        setTimeout(closeSubModal, 1500);
+    }
+
+    // 탭 전환
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+    }
+
+    // 댓글 토글
+    function toggleCmt(id) {
+        const target = document.getElementById(id);
+        target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+    }
+</script>
+
+</body>
+</html>
